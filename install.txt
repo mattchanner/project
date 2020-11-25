@@ -1,4 +1,0 @@
-
-# https://towardsdatascience.com/how-tracking-apps-analyse-your-gps-data-a-hands-on-tutorial-in-python-756d4db6715d
-
-pip install gpxpy
