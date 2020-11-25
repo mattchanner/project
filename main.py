@@ -56,11 +56,15 @@ def generate_plot(df, x, y, xlabel, ylabel, title, filename):
 
 
 def generate_plots(df, name):
+
+    if not os.path.exists('results'):
+        os.mkdir('results')
+
     # Replace any invalid file system characters with an underscore and then generate a folder
     # to output the results
     folder = re.sub('[^\w\-_\. ]', '_', name)
-    if not os.path.exists(folder):
-        os.mkdir(folder)
+    if not os.path.exists('results/' + folder):
+        os.mkdir('results/' + folder)
 
     # generate individual plots
     generate_plot(
@@ -70,7 +74,7 @@ def generate_plots(df, name):
         'Distance',
         'Elevation',
         'Elevation Plot',
-        folder + '/elevation-plot.png')
+        'results/' + folder + '/elevation-plot.png')
 
     generate_plot(
         df,
@@ -79,7 +83,7 @@ def generate_plots(df, name):
         'longitude',
         'latitude',
         'Map',
-        folder + '/map-plot.png')
+        'results/' + folder + '/map-plot.png')
 
     generate_plot(
         df,
@@ -88,7 +92,7 @@ def generate_plots(df, name):
         'Distance',
         'Pace',
         'Pace Plot',
-        folder + '/pace-plot.png')
+        'results/' + folder + '/pace-plot.png')
 
 
 def process_file(filename):
