@@ -97,6 +97,5 @@ def process_file(filename):
     generate_plots(df, name)
 
 
-process_file('gpxfiles/Pednor_5.gpx')
-process_file('gpxfiles/Bournemouth_Half.gpx')
-process_file('gpxfiles/Manchester_Marathon_2017_chip_time_3_45_05.gpx')
+for file in os.listdir('gpxfiles'):
+    process_file('gpxfiles/' + file)
