@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import haversine
 
 from os import path
-from gpx.gpx import parse
+from gpx import parse
+from charts import composite_chart
 from math import sqrt, floor
 
 
@@ -43,16 +44,7 @@ def print_summary(df, name):
     print('Gain = {0}m'.format(int(gain)))
     print('-' * 120)
 
-
-def generate_plot(df, x, y, xlabel, ylabel, title, filename):
-    plt.cool()
-    plt.plot(df[x], df[y])
-    plt.title(title, fontsize=16)
-    plt.xlabel(xlabel, fontsize=12)
-    plt.ylabel(ylabel, fontsize=12)
-    plt.grid(False)
-    plt.savefig(filename, orientation='landscape')
-    plt.close()
+    print(df)
 
 
 def generate_plots(df, name):
@@ -66,33 +58,7 @@ def generate_plots(df, name):
     if not os.path.exists('results/' + folder):
         os.mkdir('results/' + folder)
 
-    # generate individual plots
-    generate_plot(
-        df,
-        'dist_hav_3D',
-        'elev',
-        'Distance',
-        'Elevation',
-        'Elevation Plot',
-        'results/' + folder + '/elevation-plot.png')
-
-    generate_plot(
-        df,
-        'long',
-        'lat',
-        'longitude',
-        'latitude',
-        'Map',
-        'results/' + folder + '/map-plot.png')
-
-    generate_plot(
-        df,
-        'dist_hav_3D',
-        'pace_km_smoothed',
-        'Distance',
-        'Pace',
-        'Pace Plot',
-        'results/' + folder + '/pace-plot.png')
+    composite_chart(df, 'results/' + folder + '/summary.png')
 
 
 def process_file(filename):
@@ -103,3 +69,4 @@ def process_file(filename):
 
 for file in os.listdir('gpxfiles'):
     process_file('gpxfiles/' + file)
+    pass
