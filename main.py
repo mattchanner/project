@@ -6,6 +6,7 @@ import haversine
 
 from os import path
 from gpx import parse
+from analysis import trackpoints_to_dataframe
 from charts import composite_chart
 from math import sqrt, floor
 
@@ -13,7 +14,7 @@ from math import sqrt, floor
 def get_gpx_data(file):
     gpx = parse(file)
     name = gpx.tracks[0].name
-    df = gpx.tracks[0].segments[0].to_dataframe()
+    df = trackpoints_to_dataframe(gpx.tracks[0].segments[0].points)
     return (df, name)
 
 
@@ -21,6 +22,7 @@ def print_summary(df, name):
 
     print('Results for ', name)
     print('-' * 120)
+
     total_time_diff = sum(df['time_diff'])
     average_pace = sum(df['pace_km']) / len(df['pace_km'])
     hav_2d = df['dist_hav_2D']
@@ -58,7 +60,7 @@ def generate_plots(df, name):
     if not os.path.exists('results/' + folder):
         os.mkdir('results/' + folder)
 
-    composite_chart(df, 'results/' + folder + '/summary.png')
+    composite_chart(df, name, 'results/' + folder + '/summary.png')
 
 
 def process_file(filename):
