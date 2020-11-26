@@ -50,16 +50,15 @@ def composite_chart(df, title, filename):
     fig2x2 = plt.figure(constrained_layout=True, figsize=(15, 10))
 
     widths = [1]
-    heights = [3, 1]
+    heights = [1]
 
     grid_spec = gridspec.GridSpec(
-        ncols=1, nrows=2, width_ratios=widths, height_ratios=heights, figure=fig2x2)
+        ncols=1, nrows=1, width_ratios=widths, height_ratios=heights, figure=fig2x2)
 
-    lat_long_axs = fig2x2.add_subplot(grid_spec[0, :])
-    latlong(df, lat_long_axs)
-    lat_long_axs.set_title(title, fontsize=20)
+    # lat_long_axs = fig2x2.add_subplot(grid_spec[0, :])
+    # latlong(df, lat_long_axs)
 
-    elevation_axs = fig2x2.add_subplot(grid_spec[1:, :])
+    elevation_axs = fig2x2.add_subplot(grid_spec[0:, :])
 
     elevation_chart(df, elevation_axs)
 

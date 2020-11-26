@@ -1,6 +1,8 @@
+import os
 import haversine
 import pandas as pd
 
+from jinja2 import Template
 from statistics import median
 from math import sqrt, floor
 from datetime import datetime
@@ -10,43 +12,101 @@ METRES_PER_SECOND_TO_MIN_PER_KM = 16.666666667
 METRES_IN_KM = 1000
 
 
-class SummaryData:
+class Summary(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, name):
+        self.name = name
 
-    def calculate_average_pace(self):
-        pass
+    def set_total_time(self, total_time):
+        self.total_time = total_time
 
-    def print_summary(df, name):
+    def set_average_pace(self, average_pace):
+        self.average_pace = average_pace
 
-        print('Results for ', name)
+    def set_total_distance(self, total_distance):
+        self.total_distance = total_distance
+
+    def set_elevation_gain(self, elevation_gain):
+        self.elevation_gain = elevation_gain
+
+    def to_html(self):
+
+        with open('templates/summary.jinja', 'r') as fp:
+            template_text = fp.read()
+
+        template = Template(template_text)
+
+        km, m = self.distance_to_km(self.total_distance)
+        hours, mins, seconds = self.time_to_hours_mins_seconds(self.total_time)
+        pace_mins, pace_seconds = self.pace_to_mins_seconds(self.average_pace)
+
+        return template.render({
+            'name': self.name,
+            'distance_km': km,
+            'distance_m': m,
+            'time_hours': hours,
+            'time_mins': mins,
+            'time_seconds': seconds,
+            'pace_mins': pace_mins,
+            'pace_seconds': pace_seconds,
+            'elevation_gain': int(self.elevation_gain)
+        })
+
+    def summarise(self):
         print('-' * 120)
-        total_time_diff = sum(df['time_diff'])
-        average_pace = sum(df['pace_km']) / len(df['pace_km'])
-        hav_2d = df['dist_hav_2D']
-        hav_3d = df['dist_hav_3D']
+        print('Results for ', self.name)
 
-        distance_total = hav_2d[len(hav_2d)-1]
-        distance_km = floor(distance_total / 1000)
-        distance_m = int(distance_total % 1000)
-        print('Distance : {0}.{1}km'.format(distance_km, distance_m))
+        km, m = self.distance_to_km(self.total_distance)
+        print('Distance: {0}.{1}km'.format(km, m))
 
-        time_hours = floor(total_time_diff / 60 / 60)
-        time_mins = floor((total_time_diff-((time_hours * 60) * 60)) / 60)
-        time_secs = int(total_time_diff % 60)
-        print('Total time : {0}:{1}:{2}'.format(
-            time_hours, time_mins, time_secs))
+        hours, mins, seconds = self.time_to_hours_mins_seconds(self.total_time)
+        print('Total time: {0}:{1}:{2}'.format(hours, mins, seconds))
 
-        pace_mins = int(floor(average_pace))
-        pace_secs = int(60 * (average_pace - pace_mins))
-        print('Average Pace : {0}:{1}/km'.format(pace_mins, pace_secs))
+        pace_mins, pace_seconds = self.pace_to_mins_seconds(self.average_pace)
+        print('Average Pace: {0}:{1}/km'.format(pace_mins, pace_seconds))
 
-        gain = sum([x for x in df['elevation_diff'] if x > 0])
-        print('Gain = {0}m'.format(int(gain)))
+        print('Total Elevation Gain: {0}m'.format(int(self.elevation_gain)))
+
         print('-' * 120)
 
-        print(df)
+    def distance_to_km(self, distance_in_metres):
+        km = floor(distance_in_metres / 1000)
+        m = int(distance_in_metres % 1000)
+        return (km, m)
+
+    def time_to_hours_mins_seconds(self, time_in_seconds):
+        time_hours = floor(time_in_seconds / 60 / 60)
+        time_mins = floor((time_in_seconds-((time_hours * 60) * 60)) / 60)
+        time_secs = int(time_in_seconds % 60)
+
+        return (time_hours, time_mins, time_secs)
+
+    def pace_to_mins_seconds(self, pace):
+        mins = int(floor(pace))
+        secs = int(60 * (pace - mins))
+
+        return (mins, secs)
+
+
+def create_summary(df, name):
+    total_time_diff = sum(df['time_diff'])
+    average_pace = sum(df['pace_km']) / len(df['pace_km'])
+    hav_2d = df['dist_hav_2D']
+
+    distance_total = hav_2d[len(hav_2d)-1]
+    gain = sum([x for x in df['elevation_diff'] if x > 0])
+
+    summary = Summary(name)
+    summary.set_average_pace(average_pace)
+    summary.set_elevation_gain(gain)
+    summary.set_total_distance(distance_total)
+    summary.set_total_time(total_time_diff)
+
+    return summary
+
+
+def print_summary(df, name):
+    create_summary(df, name).summarise()
 
 
 def smooth(data, points):
