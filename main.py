@@ -69,4 +69,3 @@ def process_file(filename):
 
 for file in os.listdir('gpxfiles'):
     process_file('gpxfiles/' + file)
-    pass
