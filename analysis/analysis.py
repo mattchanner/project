@@ -91,9 +91,9 @@ class Summary(object):
 def create_summary(df, name):
     total_time_diff = sum(df['time_diff'])
     average_pace = sum(df['pace_km']) / len(df['pace_km'])
-    hav_2d = df['dist_hav_2D']
+    hav_3d = df['dist_hav_3D']
 
-    distance_total = hav_2d[len(hav_2d)-1]
+    distance_total = hav_3d[len(hav_3d)-1]
     gain = sum([x for x in df['elevation_diff'] if x > 0])
 
     summary = Summary(name)
@@ -118,8 +118,10 @@ def trackpoints_to_dataframe(points):
     for pt in points:
         data.append(pt.to_dict())
 
+    columns = points[0].to_dict().keys()
+
     # Generate initial data frame from source GPX data
-    df = pd.DataFrame(data=data, columns=['long', 'lat', 'elev', 'time'])
+    df = pd.DataFrame(data=data, columns=columns)
 
     # copmpute additional data based on source
     elevation_diff = [0]

@@ -2,7 +2,7 @@
 <html lang="en-gb">
     <head>
         <title>{{name}}</title>
-        <link rel="stylesheet" href="../../summary.css">
+        <link rel="stylesheet" href="../../webclient/summary.css">
         <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
         <script
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDnzdLlI6m6DP2iLh70ZS_FZ_tSaDIodwc&callback=initMap&libraries=&v=weekly"
@@ -17,10 +17,14 @@
         </div>
         <div id="img-container">
             <img src="{{filename}}" />
-        </div>
-        <div id="dataframe">
-            {{dataframe}}
+
+            {% for extension_chart in extension_charts %}
+            <img src="{{extension_chart}}" />
+            {% endfor %}
         </div>
     </body>
-    <script src="../../app.js"></script>
+    <script>
+        let points = JSON.parse('{{points}}');
+    </script>
+    <script src="../../webclient/app.js"></script>
 </html>

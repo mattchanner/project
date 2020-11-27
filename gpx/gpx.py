@@ -8,11 +8,19 @@ from datetime import datetime
 
 
 GPX_NAMESPACE = '{http://www.topografix.com/GPX/1/1}'
+TRACKPOINT_EXTENSION_NS = '{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}'
 
 
 class Trackpoint(object):
+    """
+    Represents a single track point
+    """
 
     def __init__(self, elem):
+        """
+        Initializes a new instance of the Trackpoint class
+        @param elem The XML element this point represents
+        """
         self.elem = elem
 
     @property
@@ -32,13 +40,35 @@ class Trackpoint(object):
         value = self.elem.find(GPX_NAMESPACE + "time").text
         return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
+    @property
+    def extensions(self):
+        ext_elem = self.elem.find(GPX_NAMESPACE + "extensions")
+        extensions = []
+        if ext_elem:
+            trackpoint = ext_elem.find(
+                TRACKPOINT_EXTENSION_NS + "TrackPointExtension")
+            if trackpoint:
+                for child in trackpoint:
+                    extensions.append({'name': child.tag.replace(
+                        TRACKPOINT_EXTENSION_NS, ''), 'value': child.text})
+
+        return extensions
+
     def to_dict(self):
-        return {
-            'long': self.longitude,
+
+        d = {
+            'lng': self.longitude,
             'lat': self.latitude,
             'elev': self.elevation,
             'time': self.time
         }
+
+        extensions = self.extensions
+        if extensions:
+            for ext in extensions:
+                d['ext:' + ext['name']] = float(ext['value'])
+
+        return d
 
     def __str__(self):
         return "#lat {0} #lon {1} #elev {2} #time {3}".format(
